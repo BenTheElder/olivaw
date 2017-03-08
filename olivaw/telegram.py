@@ -13,15 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-
 import json
-from urllib import request
+
+from olivaw.compat import to_bytes, Request, request_urlopen
 
 def do_request(api_key, method, data):
     url = "https://api.telegram.org/bot"+api_key+"/"+method
-    req = request.Request(url, data=bytes(json.dumps(data), 'utf-8'))
+    req = Request(url, data=to_bytes(json.dumps(data), 'utf-8'))
     req.add_header('Content-Type', 'application/json')
-    with request.urlopen(req) as f:
+    with request_urlopen(req) as f:
         print(f.read().decode('utf-8'))
 
 def set_webhook(api_key, url):

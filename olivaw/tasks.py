@@ -13,15 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-
+from __future__ import print_function
 import json
 from datetime import datetime
 from datetime import timedelta
 
 import parsedatetime as pdt
 
-import telegram
-import secrets
+import olivaw.telegram as telegram
+from olivaw.settings import secrets
 
 def do_job(job):
     print("do_job | job: %s"%(job))
@@ -31,7 +31,7 @@ def do_job(job):
         try:
             cid = data["chat_id"]
             message = "Reminder: %s"%(data["reminder"])
-            telegram.send_message(secrets.telegram_bot_key, cid, message)
+            telegram.send_message(secrets['telegram.bot_key'], cid, message)
         except:
             pass
     return True
@@ -48,10 +48,10 @@ def parse_reminder(msg):
     if len(parts) != 2:
         return False, None, None
     message, time_text = parts[0], parts[1]
-    sourceTime = datetime.utcnow()
+    source_time = datetime.utcnow()
     if msg.date:
-        sourceTime = datetime.utcfromtimestamp(int(msg.date))
-    time_struct, _ = pdt.Calendar().parse(time_text, sourceTime=sourceTime)
+        source_time = datetime.utcfromtimestamp(int(msg.date))
+    time_struct, _ = pdt.Calendar().parse(time_text, sourceTime=source_time)
     time = datetime(*time_struct[:6])
     job = {
         "data": json.dumps({

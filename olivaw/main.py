@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Copyright 2016-2017 Benjamin Elder (BenTheElder) All rights reserved.
 
@@ -18,23 +19,23 @@ from __future__ import print_function
 import logging
 from datetime import datetime
 from datetime import timedelta
-import time
 # third-party libraries
 from flask import Flask
 from flask import request
 from google.cloud import datastore
 # application imports
-import secrets
-import tasks
-import telegram
+import olivaw.tasks as tasks
+import olivaw.telegram as telegram
+from olivaw.settings import secrets
 
-app = Flask(__name__)
+# pylint: disable=I0011,invalid-name
+app = Flask(__name__.split('.')[0])
 datastore_client = datastore.Client()
 
 @app.route('/')
 def hello():
     """Handle Unknown Routes."""
-    print("hello | hit.")
+    print("/ | hit.")
     return 'Nothing to see here.'
 
 def do_jobs(deadline=None):
@@ -64,27 +65,27 @@ def do_jobs(deadline=None):
 @app.route('/_ah/health')
 def health():
     deadline = datetime.now() + timedelta(seconds=1)
-    print("health | hit.")
+    print("/_ah/health | hit.")
     n_done = do_jobs(deadline=deadline)
     reply = 'Done. (jobs: %d)' %(n_done)
-    print ("health | %s"%(reply))
+    print ("/_ah/health | %s"%(reply))
     return reply
 
 @app.route('/triggers/cron')
 def cron():
-    print("cron | hit.")
+    print("/triggers/cron | hit.")
     n_done = do_jobs()
     reply = 'Done. (jobs: %d)' %(n_done)
-    print ("cron | %s"%(reply))
+    print ("/triggers/cron | %s"%(reply))
     return reply
 
-@app.route(secrets.telegram_webhook_path, methods=['GET', 'POST'])
+@app.route(secrets['telegram.webhook_path'], methods=['GET', 'POST'])
 def webhook():
-    print('webhook | data: %s'%(request.data))
+    print('telegram_webhook | data: %s'%(request.data))
     json = request.get_json(force=True, silent=True)
     if not json:
         return ''
-    print("webhook | json: %s"%(json))
+    print("telegram_webhook | json: %s"%(json))
     update = telegram.Update(json)
     if not update.message or not update.message.text:
         return ''
@@ -97,7 +98,7 @@ def webhook():
         for k in job:
             entity[k] = job[k]
         datastore_client.put(entity)
-        telegram.send_reply(secrets.telegram_bot_key, msg, reply)
+        telegram.send_reply(secrets['telegram.bot_key'], msg, reply)
     return ''
 
 @app.errorhandler(500)
@@ -108,11 +109,14 @@ def server_error(e):
     See logs for full stacktrace.
     """.format(e), 500
 
-if __name__ == '__main__':
+def main():
     try:
-        telegram.set_webhook(secrets.telegram_bot_key, secrets.telegram_webhook_address)
+        telegram.set_webhook(secrets["telegram.bot_key"], secrets["telegram.webhook_address"])
     except:
         logging.exception('An error occured when setting the webhook.')
     # This is used when running locally. Gunicorn is used to run the
     # application on Google App Engine. See entrypoint in app.yaml.
     app.run(host='127.0.0.1', port=8080, debug=True)
+
+if __name__ == '__main__':
+    main()

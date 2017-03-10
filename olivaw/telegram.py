@@ -15,11 +15,11 @@ limitations under the License.
 '''
 import json
 
-from olivaw.compat import to_bytes, Request, request_urlopen
+from olivaw.compat import to_bytes, request, request_urlopen
 
 def do_request(api_key, method, data):
     url = "https://api.telegram.org/bot"+api_key+"/"+method
-    req = Request(url, data=to_bytes(json.dumps(data), 'utf-8'))
+    req = request.Request(url, data=to_bytes(json.dumps(data), 'utf-8'))
     req.add_header('Content-Type', 'application/json')
     with request_urlopen(req) as f:
         print(f.read().decode('utf-8'))

@@ -15,13 +15,14 @@ limitations under the License.
 '''
 from __future__ import print_function
 import json
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
+import threading
 
 import parsedatetime as pdt
 
 import olivaw.telegram as telegram
 from olivaw.settings import secrets
+from olivaw.compat import queue
 
 def do_job(job):
     print("do_job | job: %s"%(job))
@@ -35,6 +36,14 @@ def do_job(job):
         except:
             pass
     return True
+
+
+def start_job_runner():
+    job_runner = threading.Thread(target=run_jobs_forever)
+    job_runner.daemon = True
+    job_runner.start()
+    return job_runner
+
 
 
 def parse_reminder(msg):

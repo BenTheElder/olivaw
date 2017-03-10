@@ -6,8 +6,8 @@ import sys
 if sys.version_info >= (3, 0):
     # python 3 imports and exports
     from urllib import request
-    Request = request.Request
     from configparser import SafeConfigParser
+    import queue
 
     def request_urlopen(req, *args, **kwargs):
         ctx = request.urlopen(req, *args, **kwargs)
@@ -20,9 +20,9 @@ if sys.version_info >= (3, 0):
 else:
     # python 2 imports and exports
     import urllib2 as request
-    Request = request.Request
     import contextlib
     from ConfigParser import SafeConfigParser
+    import Queue as queue
 
     def request_urlopen(req, *args, **kwargs):
         ctx = contextlib.closing(request.urlopen(req, *args, **kwargs))

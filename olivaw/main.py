@@ -19,9 +19,10 @@ from __future__ import print_function
 import logging
 from datetime import datetime
 from datetime import timedelta
+import time
+import sched
 # third-party libraries
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from google.cloud import datastore
 # application imports
 import olivaw.tasks as tasks
@@ -31,6 +32,8 @@ from olivaw.settings import secrets
 # pylint: disable=I0011,invalid-name
 app = Flask(__name__.split('.')[0])
 datastore_client = datastore.Client()
+scheduler = sched.scheduler(time.time, time.sleep)
+
 
 @app.route('/')
 def hello():

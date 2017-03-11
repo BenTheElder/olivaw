@@ -2,24 +2,29 @@ import threading
 from datetime import datetime
 
 from olivaw.compat import queue
+import olivaw.tasks as tasks 
 
-# TODO: specify job format
 # TODO: hooks for persisting jobs
-# TODO: start_time format
+# TODO: error handling
 
-class Sheduler(object):
+class Scheduler(object):
     def __init__(self):
         self._cond = threading.Condition()
-        self._wait_time = 1.
+        self._default_wait_time = 60.
         self._job_queue = queue.PriorityQueue()
 
     def run(self):
         while True:
             # wait for a job to be ready
-            self._cond.wait_for(self.job_ready(), timeout=self._wait_time)
+            self._cond.acquire()
+            wait_time = self.next_wait_time()
+            while wait_time > 0:
+                self._cond.wait(timeout=wait_time)
+                wait_time = self.next_wait_time()
+            self._cond.release()
             # fetch the first job
             try:
-                start_time, job = self._job_queue.get()
+                start_time, job = self._job_queue.get_nowait()
             except queue.Empty:
                 continue
             # run all ready jobs
@@ -28,12 +33,12 @@ class Sheduler(object):
                 # run job
                 # TODO: how should we handle this?
                 try:
-                    job[0](job[1:])
+                    tasks.do_job(job)
                     job_done = True
                 except:
                     pass
                 try:
-                    start_time, job = self._job_queue.get()
+                    start_time, job = self._job_queue.get_nowait()
                     job_done = False
                 except queue.Empty:
                     break
@@ -41,22 +46,22 @@ class Sheduler(object):
             if not job_done:
                 self._job_queue.put_nowait((start_time, job))
 
-    def job_ready(self):
+    def next_wait_time(self):
         # get first job in queue
         try:
-            start_time, job = self._job_queue.get()
+            start_time, job = self._job_queue.get_nowait()
         except queue.Empty:
-            return False
+            # if no job, return default wait time
+            return self._default_wait_time
         # put job back in queue
         self._job_queue.put_nowait((start_time, job))
-        # return wether it is time to do job
-        return start_time <= datetime.utcnow()
+        # return time to next job
+        return (start_time - datetime.utcnow()).total_seconds()
 
     def add_job(self, start_time, job):
         # add job to queue
+        self._cond.acquire()
         self._job_queue.put_nowait((start_time, job))
         # alert runner that there is a job
-        self._cond.acquire()
         self._cond.notify()
         self._cond.release()
-

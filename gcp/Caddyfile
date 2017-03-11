@@ -1,0 +1,23 @@
+# static site
+{$CADDY_DOMAIN_NAME} {
+    root /home/olivaw/www
+    git {
+        repo {$CADDY_GIT_REPO}
+        hook /git-hook {$CADDY_GIT_HOOK_KEY}
+    }
+    gzip
+    tls {$CLOUDFLARE_EMAIL}
+    tls {
+        dns cloudflare
+    }
+}
+
+# olivaw
+olivaw.{$CADDY_DOMAIN_NAME} {
+    proxy / localhost:8080
+    gzip
+    tls {$CLOUDFLARE_EMAIL}
+    tls {
+        dns cloudflare
+    }
+}

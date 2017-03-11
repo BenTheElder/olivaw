@@ -1,6 +1,10 @@
 from __future__ import print_function
 
 import sys
+import codecs
+
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+sys.stderr = codecs.getwriter('utf8')(sys.stderr)
 
 # python 3
 if sys.version_info >= (3, 0):

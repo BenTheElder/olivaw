@@ -38,14 +38,6 @@ def do_job(job):
     return True
 
 
-def start_job_runner():
-    job_runner = threading.Thread(target=run_jobs_forever)
-    job_runner.daemon = True
-    job_runner.start()
-    return job_runner
-
-
-
 def parse_reminder(msg):
     reminder_command = "/reminder"
     text = msg.text
@@ -53,7 +45,7 @@ def parse_reminder(msg):
     if not text.startswith(reminder_command):
         return False, None, None
     parts = text[len(reminder_command):].split(",")
-    print("parse_reminder, parts: %s"%(parts))
+    print("parse_reminder, parts: %s" % (parts))
     if len(parts) != 2:
         return False, None, None
     message, time_text = parts[0], parts[1]
@@ -68,7 +60,7 @@ def parse_reminder(msg):
             "reminder": message,
             "chat_id": msg.chat_id()
         }),
-        "timestamp": str(int((time - datetime(1970, 1, 1)) / timedelta(seconds=1))),
+        "timestamp": str(int((time - datetime(1970, 1, 1)).total_seconds())),
     }
-    reply = "Set reminder for %s UTC."%(str(time))
+    reply = "Set reminder for %s UTC." % (str(time))
     return True, job, reply

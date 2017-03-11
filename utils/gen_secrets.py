@@ -15,20 +15,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 try:
-   input = raw_input
+    input = raw_input
 except NameError:
-   pass
+    pass
 from os import path
-self_path = path.dirname(__file__)
-secrets_path = path.join(self_path, "..", "secrets.cfg")
-url = input("Enter the relative path (eg '/foo') for the telegram webhook: ")
-host = input("Enter the host address (eg 'https://foo.appspot.com'): ")
-bot = input("Enter the telegram bot api key: ")
-with open(secrets_path, "w") as f:
-    f.write("# AUTOMATICALLY GENERATED DO NOT EDIT!\n")
-    f.write("# DO NOT CHECK INTO GIT.\n")
-    f.write("\n")
-    f.write("# Telegram Secrets.\n[telegram]")
-    f.write("telegram_webhook_path = %s\n"%(url))
-    f.write("telegram_webhook_address = '%s%s'\n"%(host, url))
-    f.write("telegram_bot_key = '%s'\n"%(bot))
+
+def main():
+    """generates secrets.cfg"""
+    self_path = path.dirname(__file__)
+    secrets_path = path.join(self_path, "..", "secrets.cfg")
+    url = input("Enter the relative path (eg '/foo') for the telegram webhook: ")
+    host = input("Enter the host address (eg 'https://foo.appspot.com'): ")
+    bot = input("Enter the telegram bot api key: ")
+    with open(secrets_path, "w") as _file:
+        _file.write("# AUTOMATICALLY GENERATED DO NOT EDIT!\n")
+        _file.write("# DO NOT CHECK INTO GIT.\n")
+        _file.write("\n")
+        _file.write("# Telegram Secrets.\n[telegram]")
+        _file.write("telegram_webhook_path = %s\n"%(url))
+        _file.write("telegram_webhook_address = '%s%s'\n"%(host, url))
+        _file.write("telegram_bot_key = '%s'\n"%(bot))
+
+if __name__ == "__main__":
+    main()

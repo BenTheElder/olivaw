@@ -3,7 +3,7 @@
 <img src ="/static/olivaw.png" alt="olivaw logo" width="200px"></img>
 
 
-A WIP bot written in Python with [Flask](http://flask.pocoo.org/) and [App Engine](https://cloud.google.com/appengine/)
+A WIP bot written in Python with [Flask](http://flask.pocoo.org/) and [Google Compute Engine](https://cloud.google.com/compute/)
 
 ------------------------------
 ## License

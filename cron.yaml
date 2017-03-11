@@ -1,4 +1,0 @@
-cron:
-- description: regular update task
-  url: /triggers/cron
-  schedule: every 1 minutes

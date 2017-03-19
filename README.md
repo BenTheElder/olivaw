@@ -1,4 +1,4 @@
-# olivaw
+# Olivaw
 
 <img src ="/static/olivaw.png" alt="olivaw logo" width="200px"></img>
 

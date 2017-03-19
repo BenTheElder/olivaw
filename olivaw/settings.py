@@ -12,11 +12,15 @@ def config_section_to_dict(config, section):
         section_dict[section+'.'+option] = config.get(section, option)
     return section_dict
 
-try:
-    secrets_path = os.environ["SECRETS_PATH"]
-    config = SafeConfigParser()
-    config.read(secrets_path)
-    secrets = config_section_to_dict(config, 'telegram')
-except:
-    # TODO
-    pass
+def init(secrets_path=None):
+    """initializes settings"""
+    global secrets
+    try:
+        if secrets_path is None:
+            secrets_path = os.environ["SECRETS_PATH"]
+        config = SafeConfigParser()
+        config.read(secrets_path)
+        secrets = config_section_to_dict(config, 'telegram')
+    except:
+        # TODO
+        pass
